@@ -22,26 +22,26 @@ class SecurityRules
     /**
      * Method prepares file system for saving file
      *
-     * @param string $filePrefix
+     * @param string $pathPrefix
      *            Prefix to file path
      * @return string File path
      * @codeCoverageIgnore
      */
-    protected function prepareFs(string $filePrefix): string
+    protected function prepareFs(string $pathPrefix): string
     {
-        @mkdir($filePrefix . '/data/');
+        @mkdir($pathPrefix . '/data/');
 
         $path = '/data/files/';
 
-        @mkdir($filePrefix . $path);
+        @mkdir($pathPrefix . $path);
 
-        @mkdir($filePrefix . $path . date('Y') . '/');
+        @mkdir($pathPrefix . $path . date('Y') . '/');
 
-        @mkdir($filePrefix . $path . date('Y') . '/' . date('m') . '/');
+        @mkdir($pathPrefix . $path . date('Y') . '/' . date('m') . '/');
 
         $dir = $path . date('Y') . '/' . date('m') . '/' . date('d') . '/';
 
-        @mkdir($filePrefix . $dir);
+        @mkdir($pathPrefix . $dir);
 
         return $dir;
     }
@@ -142,9 +142,10 @@ class SecurityRules
      *            Data about the uploaded file
      * @param bool $storeFiles
      *            Must be the file stored in the file system of the service or not
+     * @param string $pathPrefix prefix of the file path
      * @return string|array Path to the stored file or the array $value itself
      */
-    public function getFileValue($value, bool $storeFiles)
+    public function getFileValue($value, bool $storeFiles, string $pathPrefix = '.')
     {
         if (is_string($value)) {
             $value = $_FILES[$value];
@@ -155,7 +156,7 @@ class SecurityRules
         }
 
         if ($storeFiles) {
-            $dir = '.' . $this->prepareFs('.');
+            $dir = '.' . $this->prepareFs($pathPrefix);
 
             $uploadFile = $dir . md5($value['name'] . microtime(true)) . '.' .
                 pathinfo($value['name'], PATHINFO_EXTENSION);

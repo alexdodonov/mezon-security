@@ -1,4 +1,5 @@
 <?php
+require_once (__DIR__ . '/../SecurityRules.php');
 
 class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
 {
