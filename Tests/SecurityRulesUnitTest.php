@@ -1,8 +1,25 @@
 <?php
-require_once (__DIR__ . '/../SecurityRules.php');
+namespace Mezon\Security\Tests;
 
 class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
 {
+
+    /**
+     * Path to the directory where all files are stored
+     *
+     * @var string
+     */
+    public const PATH_TO_FILE_STORAGE = '/data/files/';
+
+    /**
+     * Method returns path to storage
+     *
+     * @return string path to storage
+     */
+    protected function getPathToStorage(): string
+    {
+        return SecurityRulesUnitTest::PATH_TO_FILE_STORAGE . date('Y/m/d/');
+    }
 
     /**
      * Testing edge cases of getFileValue
@@ -32,6 +49,35 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Method constructs element of the $_FILES array
+     *
+     * @param int $size
+     *            size of the file
+     * @param string $file
+     *            file path
+     * @param string $name
+     *            file name
+     * @return array element of the $_FILES array
+     */
+    protected function constructUploadedFile(int $size, string $file, string $name, string $tmpName = ''): array
+    {
+        $return = [
+            'size' => $size,
+            'name' => $name
+        ];
+
+        if ($file !== '') {
+            $return['file'] = $file;
+        }
+
+        if ($tmpName !== '') {
+            $return['tmp_name'] = $tmpName;
+        }
+
+        return $return;
+    }
+
+    /**
      * Data provider for the testGetFileValue test
      *
      * @return array data for test testGetFileValue
@@ -42,31 +88,19 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             [
                 true,
                 [
-                    'test-file' => [
-                        'size' => 1,
-                        'file' => '1',
-                        'name' => '1'
-                    ]
+                    'test-file' => $this->constructUploadedFile(2000, '1', '1')
                 ]
             ],
             [
                 false,
                 [
-                    'test-file' => [
-                        'size' => 1,
-                        'file' => '1',
-                        'name' => '1'
-                    ]
+                    'test-file' => $this->constructUploadedFile(1, '1', '1')
                 ]
             ],
             [
                 true,
                 [
-                    'test-file' => [
-                        'size' => 1,
-                        'tmp_name' => '1',
-                        'name' => '1'
-                    ]
+                    'test-file' => $this->constructUploadedFile(1, '', '1', '1')
                 ]
             ]
         ];
@@ -109,7 +143,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
 
         // assertions
         if ($storeFile) {
-            $this->assertStringContainsString('/data/files/' . date('Y/m/d/'), $result);
+            $this->assertStringContainsString($this->getPathToStorage(), $result);
         } else {
             $this->assertEquals(1, $result['size']);
 
@@ -160,10 +194,10 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             ->method('filePutContents');
 
         // test body
-        $result = $securityRules->storeFileContent('content', 'prefix', $decoded);
+        $result = $securityRules->storeFileContent('content', 'file-prefix', $decoded);
 
         // assertions
-        $this->assertStringContainsString('/data/files/' . date('Y/m/d/'), $result);
+        $this->assertStringContainsString($this->getPathToStorage(), $result);
     }
 
     /**
@@ -203,7 +237,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
         $result = $securityRules->storeFile('c://file', 'prefix');
 
         // assertions
-        $this->assertStringContainsString('/data/files/' . date('Y/m/d/'), $result);
+        $this->assertStringContainsString($this->getPathToStorage(), $result);
     }
 
     /**
@@ -219,5 +253,77 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
 
         // assertions
         $this->assertNull($result);
+    }
+
+    /**
+     * Data provider for the test testIsUploadedFileValid
+     *
+     * @return array testing data
+     */
+    public function isUploadFileValidProvider(): array
+    {
+        return [
+            [
+                $this->constructUploadedFile(2000, '1', '1'),
+                [],
+                true
+            ],
+            [
+                $this->constructUploadedFile(2000, '1', '1'),
+                [
+                    new \Mezon\Security\Validators\File\Size(2000)
+                ],
+                true
+            ],
+            [
+                $this->constructUploadedFile(2000, '1', '1'),
+                [
+                    new \Mezon\Security\Validators\File\Size(1500)
+                ],
+                false
+            ]
+        ];
+    }
+
+    /**
+     * Testing that uploaded file is valid
+     *
+     * @param array $file
+     *            uploaded file
+     * @param array $validators
+     *            validators
+     * @param bool $requiredResult
+     *            required result
+     * @dataProvider isUPloadFileValidProvider
+     */
+    public function testIsUploadedFileValid(array $file, array $validators, bool $requiredResult): void
+    {
+        // setup
+        $security = new \Mezon\Security\SecurityRules();
+        $_FILES['is-valid-file'] = $file;
+
+        // test body
+        $result = $security->isUploadedFileValid('is-valid-file', $validators);
+
+        // assertions
+        $this->assertEquals($requiredResult, $result);
+    }
+
+    /**
+     * Trying to validate size of the unexisting file
+     */
+    public function testValidatingSizeOfUnexistingFile(): void
+    {
+        // assertions
+        $this->expectException(\Exception::class);
+
+        // setup
+        $security = new \Mezon\Security\SecurityRules();
+        $validators = [
+            new \Mezon\Security\Validators\File\Size(2000)
+        ];
+
+        // test body
+        $security->isUploadedFileValid('unexisting-file', $validators);
     }
 }

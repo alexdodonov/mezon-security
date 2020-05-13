@@ -142,7 +142,8 @@ class SecurityRules
      *            Data about the uploaded file
      * @param bool $storeFiles
      *            Must be the file stored in the file system of the service or not
-     * @param string $pathPrefix prefix of the file path
+     * @param string $pathPrefix
+     *            prefix of the file path
      * @return string|array Path to the stored file or the array $value itself
      */
     public function getFileValue($value, bool $storeFiles, string $pathPrefix = '.')
@@ -184,5 +185,27 @@ class SecurityRules
     public function getStringValue(string $value): string
     {
         return htmlspecialchars($value);
+    }
+
+    /**
+     * Method validates uploaded file
+     *
+     * @param string $fieldName
+     *            field in the $_FILES array
+     * @param array $validators
+     *            list of validators
+     * @return bool true if the file valid and false otherwise.
+     */
+    public function isUploadedFileValid(string $fieldName, array $validators = []): bool
+    {
+        foreach ($validators as $validator) {
+            $validator->setValidatingData($fieldName);
+
+            if ($validator->valid() === false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

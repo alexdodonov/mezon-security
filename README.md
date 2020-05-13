@@ -1,0 +1,39 @@
+# Security validations
+[![Build Status](https://travis-ci.com/alexdodonov/mezon-security.svg?branch=master)](https://travis-ci.com/alexdodonov/mezon-security) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/alexdodonov/mezon-security/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/alexdodonov/mezon-security/?branch=master) [![codecov](https://codecov.io/gh/alexdodonov/mezon-security/branch/master/graph/badge.svg)](https://codecov.io/gh/alexdodonov/mezon-security)
+
+## Intro
+Mezon provides set of classes wich will help you to validate data from front-end
+
+## Installation
+
+Just print in console
+
+```
+composer require mezon/security
+```
+
+And that's all )
+
+## Files validations
+
+### Size validations
+
+First of all you need to create validator for the file size:
+
+```php
+use \Mezon\Security;
+
+// here we set that file must not be greater then 2KB
+$sizeValidator = new Validators\File\Size(2 * Validators\File\Size::KB);
+```
+
+Then you can run validation
+
+```PHP
+$security = new SecurityRules();
+$security->isUploadedFileValid('uploaded-file', $validators);
+```
+
+Here 'uploaded-file' is an index in the $_FILES array.
+
+# I'll be very glad if you'll press "STAR" button )
