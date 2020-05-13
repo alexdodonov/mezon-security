@@ -52,7 +52,6 @@ class Size implements \Mezon\Security\Validators\ValidatorInterface
      *
      * @param int $size
      *            size constraint for the file
-     * @codeCoverageIgnore
      */
     public function __construct(int $size)
     {
