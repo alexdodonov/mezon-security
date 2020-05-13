@@ -2,7 +2,7 @@
 namespace Mezon\Security\Validators\File;
 
 /**
- * Class Size
+ * Class MimeType
  *
  * @package Mezon
  * @subpackage Security
@@ -10,29 +10,8 @@ namespace Mezon\Security\Validators\File;
  * @version v.1.0 (2020/05/13)
  * @copyright Copyright (c) 2020, aeon.org
  */
-class Size implements \Mezon\Security\Validators\ValidatorInterface
+class MimeType implements \Mezon\Security\Validators\ValidatorInterface
 {
-
-    /**
-     * Bytes in KB
-     *
-     * @var integer
-     */
-    public const KB = 1024;
-
-    /**
-     * Bytes in MB
-     *
-     * @var integer
-     */
-    public const MB = 1048576;
-
-    /**
-     * Bytes in GB
-     *
-     * @var integer
-     */
-    public const GB = 1073741824;
 
     /**
      * Index in the $_FILES array
@@ -42,22 +21,22 @@ class Size implements \Mezon\Security\Validators\ValidatorInterface
     private $file = '';
 
     /**
-     * Required size in bytes
+     * Available mime types
      *
-     * @var integer
+     * @var array
      */
-    private $requiredSize = 0;
+    private $requiredTypes = [];
 
     /**
      * Constructor
      *
-     * @param int $size
-     *            size constraint for the file
+     * @param array $types
+     *            mime type constraint for the file
      * @codeCoverageIgnore
      */
-    public function __construct(int $size)
+    public function __construct(array $types)
     {
-        $this->requiredSize = $size;
+        $this->requiredTypes = $types;
     }
 
     /**
@@ -71,7 +50,7 @@ class Size implements \Mezon\Security\Validators\ValidatorInterface
             throw (new \Exception('The index "' . $this->file . '" was not found in the $_FILES array', - 1));
         }
 
-        return $_FILES[$this->file]['size'] <= $this->requiredSize;
+        return in_array(mime_content_type($_FILES[$this->file]['tmp_name']), $this->requiredTypes);
     }
 
     /**

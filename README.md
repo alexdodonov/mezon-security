@@ -36,4 +36,15 @@ $security->isUploadedFileValid('uploaded-file', $validators);
 
 Here 'uploaded-file' is an index in the $_FILES array.
 
+### Mime-types validations
+
+You can validate mime types of the uploading files. To do this construct special validator and pass a list of valid mime types to it's constructor
+
+```php
+// here we set that file must not be greater then 2KB
+$sizeValidator = new Validators\File\MymeType(['image/png', 'image/jpeg', 'image/jpg']);
+```
+
+And then call isUploadedFileValid like in the example above.
+
 # I'll be very glad if you'll press "STAR" button )

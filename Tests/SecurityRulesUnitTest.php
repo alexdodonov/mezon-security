@@ -28,7 +28,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     {
         // setup
         $_FILES = [
-            'test-file' => [
+            'empty-file' => [
                 'size' => 0
             ]
         ];
@@ -42,7 +42,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         // test body
-        $result = $securityRules->getFileValue('test-file', false);
+        $result = $securityRules->getFileValue('empty-file', false);
 
         // assertions
         $this->assertEquals('', $result);
@@ -71,7 +71,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
         }
 
         if ($tmpName !== '') {
-            $return['tmp_name'] = $tmpName;
+            $return['tmp_' . 'name'] = $tmpName;
         }
 
         return $return;
@@ -107,6 +107,18 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Method returns true if the field tmp_name is set
+     *
+     * @param array $file
+     *            validating file description
+     * @return bool true if the field tmp_name is set, false otherwise
+     */
+    protected function tmpNameSet(array $file): bool
+    {
+        return isset($file['tmp_name']);
+    }
+
+    /**
      * Testing edge cases of getFileValue
      *
      * @param bool $storeFile
@@ -129,7 +141,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         if ($storeFile) {
-            if (isset($files['test-file']['tmp_name'])) {
+            if ($this->tmpNameSet($files['test-file'])) {
                 $securityRules->expects($this->once())
                     ->method('moveUploadedFile');
             } else {
@@ -148,7 +160,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals(1, $result['size']);
 
             $this->assertEquals('1', $result['name']);
-            if (isset($files['test-file']['tmp_name'])) {
+            if ($this->tmpNameSet($files['test-file'])) {
                 $this->assertEquals('1', $result['tmp_name']);
             } else {
                 $this->assertEquals('1', $result['file']);
@@ -281,6 +293,24 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
                     new \Mezon\Security\Validators\File\Size(1500)
                 ],
                 false
+            ],
+            [
+                $this->constructUploadedFile(2000, '1', '1', __DIR__ . '/SecurityRulesUnitTest.php'),
+                [
+                    new \Mezon\Security\Validators\File\MimeType([
+                        'text/x-php'
+                    ])
+                ],
+                true
+            ],
+            [
+                $this->constructUploadedFile(2000, '1', '1', __DIR__ . '/SecurityRulesUnitTest.php'),
+                [
+                    new \Mezon\Security\Validators\File\MimeType([
+                        'image/png'
+                    ])
+                ],
+                false
             ]
         ];
     }
@@ -294,7 +324,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
      *            validators
      * @param bool $requiredResult
      *            required result
-     * @dataProvider isUPloadFileValidProvider
+     * @dataProvider isUploadFileValidProvider
      */
     public function testIsUploadedFileValid(array $file, array $validators, bool $requiredResult): void
     {
@@ -310,20 +340,42 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Trying to validate size of the unexisting file
+     * Data provider for the test testValidatingUnexistingFile
+     *
+     * @return array testing data
      */
-    public function testValidatingSizeOfUnexistingFile(): void
+    public function validatingUnexistingFileProvider(): array
+    {
+        return [
+            [
+                new \Mezon\Security\Validators\File\Size(2000)
+            ],
+            [
+                new \Mezon\Security\Validators\File\MimeType([
+                    'image/png'
+                ])
+            ]
+        ];
+    }
+
+    /**
+     * Trying to validate size of the unexisting file
+     *
+     * @param object $validator
+     *            validator
+     * @dataProvider validatingUnexistingFileProvider
+     */
+    public function testValidatingUnexistingFile(object $validator): void
     {
         // assertions
         $this->expectException(\Exception::class);
 
         // setup
         $security = new \Mezon\Security\SecurityRules();
-        $validators = [
-            new \Mezon\Security\Validators\File\Size(2000)
-        ];
 
         // test body
-        $security->isUploadedFileValid('unexisting-file', $validators);
+        $security->isUploadedFileValid('unexisting-file', [
+            $validator
+        ]);
     }
 }
