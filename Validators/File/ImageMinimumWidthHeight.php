@@ -2,7 +2,7 @@
 namespace Mezon\Security\Validators\File;
 
 /**
- * Class MimeType
+ * Class ImageMinimumWidthHeight
  *
  * @package Mezon
  * @subpackage Security
@@ -10,7 +10,7 @@ namespace Mezon\Security\Validators\File;
  * @version v.1.0 (2020/05/13)
  * @copyright Copyright (c) 2020, aeon.org
  */
-class MimeType extends \Mezon\Security\Validators\AbstractValidator
+class ImageMinimumWidthHeight extends \Mezon\Security\Validators\AbstractValidator
 {
 
     /**
@@ -21,22 +21,33 @@ class MimeType extends \Mezon\Security\Validators\AbstractValidator
     private $file = '';
 
     /**
-     * Available mime types
+     * Minumum width of the image
      *
-     * @var array
+     * @var integer
      */
-    private $requiredTypes = [];
+    private $minimumWidth = 0;
+
+    /**
+     * Minumum height of the image
+     *
+     * @var integer
+     */
+    private $minimumHeight = 0;
 
     /**
      * Constructor
      *
-     * @param array $types
-     *            mime type constraint for the file
+     * @param int $width
+     *            width constraint for the file
+     * @param int $height
+     *            height constraint for the file
      * @codeCoverageIgnore
      */
-    public function __construct(array $types)
+    public function __construct(int $width, int $height)
     {
-        $this->requiredTypes = $types;
+        $this->minimumWidth = $width;
+
+        $this->minimumHeight = $height;
     }
 
     /**
@@ -48,7 +59,9 @@ class MimeType extends \Mezon\Security\Validators\AbstractValidator
     {
         $this->validateFilesFieldExists($this->file);
 
-        return in_array(mime_content_type($_FILES[$this->file]['tmp_name']), $this->requiredTypes);
+        list($width, $height) = getimagesize($_FILES[$this->file]['tmp_name']);
+
+        return $width >= $this->minimumWidth && $height >= $this->minimumHeight;
     }
 
     /**

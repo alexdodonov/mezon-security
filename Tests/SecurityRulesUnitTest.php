@@ -12,6 +12,20 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     public const PATH_TO_FILE_STORAGE = '/data/files/';
 
     /**
+     * Field name of the testing file
+     *
+     * @var string
+     */
+    public const TEST_FILE_FIELD_NAME = 'test-file';
+
+    /**
+     * Testing image
+     * 
+     * @var string
+     */
+    public const TEST_PNG_IMAGE_PATH = __DIR__.'/res/test.png';
+
+    /**
      * Method returns path to storage
      *
      * @return string path to storage
@@ -78,6 +92,24 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Method constructs $_FILES array with one element
+     *
+     * @param int $size
+     *            size of the file
+     * @param string $file
+     *            file path
+     * @param string $name
+     *            file name
+     * @return array element of the $_FILES array
+     */
+    protected function constructTestFiles(int $size, string $file, string $name, string $tmpName = ''): array
+    {
+        return [
+            SecurityRulesUnitTest::TEST_FILE_FIELD_NAME => $this->constructUploadedFile($size, $file, $name, $tmpName)
+        ];
+    }
+
+    /**
      * Data provider for the testGetFileValue test
      *
      * @return array data for test testGetFileValue
@@ -87,21 +119,15 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 true,
-                [
-                    'test-file' => $this->constructUploadedFile(2000, '1', '1')
-                ]
+                $this->constructTestFiles(2000, '1', '1')
             ],
             [
                 false,
-                [
-                    'test-file' => $this->constructUploadedFile(1, '1', '1')
-                ]
+                $this->constructTestFiles(1, '1', '1')
             ],
             [
                 true,
-                [
-                    'test-file' => $this->constructUploadedFile(1, '', '1', '1')
-                ]
+                $this->constructTestFiles(1, '', '1', '1')
             ]
         ];
     }
@@ -141,7 +167,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         if ($storeFile) {
-            if ($this->tmpNameSet($files['test-file'])) {
+            if ($this->tmpNameSet($files[SecurityRulesUnitTest::TEST_FILE_FIELD_NAME])) {
                 $securityRules->expects($this->once())
                     ->method('moveUploadedFile');
             } else {
@@ -151,7 +177,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
         }
 
         // test body
-        $result = $securityRules->getFileValue('test-file', $storeFile);
+        $result = $securityRules->getFileValue(SecurityRulesUnitTest::TEST_FILE_FIELD_NAME, $storeFile);
 
         // assertions
         if ($storeFile) {
@@ -160,7 +186,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals(1, $result['size']);
 
             $this->assertEquals('1', $result['name']);
-            if ($this->tmpNameSet($files['test-file'])) {
+            if ($this->tmpNameSet($files[SecurityRulesUnitTest::TEST_FILE_FIELD_NAME])) {
                 $this->assertEquals('1', $result['tmp_name']);
             } else {
                 $this->assertEquals('1', $result['file']);
@@ -311,6 +337,71 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
                     ])
                 ],
                 false
+            ],
+            [
+                $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
+                [
+                    new \Mezon\Security\Validators\File\MimeType([
+                        'image/png'
+                    ])
+                ],
+                true
+            ],
+            [
+                $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
+                [
+                    new \Mezon\Security\Validators\File\ImageMaximumWidthHeight(500, 500)
+                ],
+                false
+            ],
+            [
+                $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
+                [
+                    new \Mezon\Security\Validators\File\ImageMaximumWidthHeight(500, 600)
+                ],
+                false
+            ],
+            [
+                $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
+                [
+                    new \Mezon\Security\Validators\File\ImageMaximumWidthHeight(500, 500)
+                ],
+                false
+            ],
+            [
+                $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
+                [
+                    new \Mezon\Security\Validators\File\ImageMaximumWidthHeight(600, 600)
+                ],
+                true
+            ],
+            [
+                $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
+                [
+                    new \Mezon\Security\Validators\File\ImageMinimumWidthHeight(500, 500)
+                ],
+                true
+            ],
+            [
+                $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
+                [
+                    new \Mezon\Security\Validators\File\ImageMinimumWidthHeight(600, 500)
+                ],
+                false
+            ],
+            [
+                $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
+                [
+                    new \Mezon\Security\Validators\File\ImageMinimumWidthHeight(500, 600)
+                ],
+                false
+            ],
+            [
+                $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
+                [
+                    new \Mezon\Security\Validators\File\ImageMinimumWidthHeight(600, 600)
+                ],
+                false
             ]
         ];
     }
@@ -352,7 +443,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 new \Mezon\Security\Validators\File\MimeType([
-                    'image/png'
+                    'image/jpeg'
                 ])
             ]
         ];

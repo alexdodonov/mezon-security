@@ -2,7 +2,7 @@
 namespace Mezon\Security\Validators;
 
 /**
- * Class Size
+ * Class ValidatorInterface
  *
  * @package Mezon
  * @subpackage Security

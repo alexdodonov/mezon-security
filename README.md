@@ -47,4 +47,16 @@ $sizeValidator = new Validators\File\MymeType(['image/png', 'image/jpeg', 'image
 
 And then call isUploadedFileValid like in the example above.
 
+### Image validators
+
+You can use validators for the image size:
+
+```php
+new Mezon\Security\Validators\File\ImageMaximumWidthHeight(<maximum width>, <maximum height>);
+
+// and
+
+new Mezon\Security\Validators\File\ImageMinimumWidthHeight(<minimum width>, <minimum height>);
+```
+
 # I'll be very glad if you'll press "STAR" button )

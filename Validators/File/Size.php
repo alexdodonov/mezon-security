@@ -10,7 +10,7 @@ namespace Mezon\Security\Validators\File;
  * @version v.1.0 (2020/05/13)
  * @copyright Copyright (c) 2020, aeon.org
  */
-class Size implements \Mezon\Security\Validators\ValidatorInterface
+class Size extends \Mezon\Security\Validators\AbstractValidator
 {
 
     /**
@@ -67,9 +67,7 @@ class Size implements \Mezon\Security\Validators\ValidatorInterface
      */
     public function valid(): bool
     {
-        if (isset($_FILES[$this->file]) === false) {
-            throw (new \Exception('The index "' . $this->file . '" was not found in the $_FILES array', - 1));
-        }
+        $this->validateFilesFieldExists($this->file);
 
         return $_FILES[$this->file]['size'] <= $this->requiredSize;
     }
