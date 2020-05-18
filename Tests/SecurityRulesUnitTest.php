@@ -20,10 +20,22 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Testing image
-     * 
+     *
      * @var string
      */
-    public const TEST_PNG_IMAGE_PATH = __DIR__.'/res/test.png';
+    public const TEST_PNG_IMAGE_PATH = __DIR__ . '/res/test.png';
+
+    /**
+     * List of methods wich provides file system access and need to be mocked
+     *
+     * @var array
+     */
+    public const FILE_SYSTEM_ACCESS_METHODS = [
+        '_prepareFs',
+        'filePutContents',
+        'moveUploadedFile',
+        'fileGetContents'
+    ];
 
     /**
      * Method returns path to storage
@@ -47,11 +59,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             ]
         ];
         $securityRules = $this->getMockBuilder(\Mezon\Security\SecurityRules::class)
-            ->setMethods([
-            '_prepareFs',
-            'filePutContents',
-            'moveUploadedFile'
-        ])
+            ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
             ->setConstructorArgs([])
             ->getMock();
 
@@ -158,11 +166,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
         // setup
         $_FILES = $files;
         $securityRules = $this->getMockBuilder(\Mezon\Security\SecurityRules::class)
-            ->setMethods([
-            '_prepareFs',
-            'filePutContents',
-            'moveUploadedFile'
-        ])
+            ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
             ->setConstructorArgs([])
             ->getMock();
 
@@ -220,11 +224,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     {
         // setup
         $securityRules = $this->getMockBuilder(\Mezon\Security\SecurityRules::class)
-            ->setMethods([
-            '_prepareFs',
-            'filePutContents',
-            'moveUploadedFile'
-        ])
+            ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
             ->setConstructorArgs([])
             ->getMock();
         $securityRules->method('_prepareFs')->willReturn('prepared');
@@ -248,11 +248,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     protected function getStoreFileMock($returnValue): object
     {
         $securityRules = $this->getMockBuilder(\Mezon\Security\SecurityRules::class)
-            ->setMethods([
-            'fileGetContents',
-            '_prepareFs',
-            'filePutContents',
-        ])
+            ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
             ->setConstructorArgs([])
             ->getMock();
         $securityRules->expects($this->once())
@@ -468,5 +464,37 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
         $security->isUploadedFileValid('unexisting-file', [
             $validator
         ]);
+    }
+
+    /**
+     * Testing getIntValue method
+     */
+    public function testGetIntValue(): void
+    {
+        // setup
+        $security = new \Mezon\Security\SecurityRules();
+
+        // test body and assertions
+        $this->assertEquals(1, $security->getIntValue('1'));
+        $this->assertEquals(2, $security->getIntValue(2));
+        $this->assertEquals(0, $security->getIntValue('abc'));
+        $this->assertEquals(1, $security->getIntValue(1.1));
+    }
+
+    /**
+     * Testing getStringValue
+     */
+    public function testGetStringValue(): void
+    {
+        // setup
+        $security = new \Mezon\Security\SecurityRules();
+
+        // test body and assertions
+        $this->assertEquals('1', $security->getStringValue('1'));
+        $this->assertEquals('1', $security->getStringValue(1));
+        $this->assertEquals('2.1', $security->getStringValue(2.1));
+        $this->assertEquals('&amp;', $security->getStringValue('&'));
+        $this->assertEquals('&lt;', $security->getStringValue('<'));
+        $this->assertEquals('&gt;', $security->getStringValue('>'));
     }
 }

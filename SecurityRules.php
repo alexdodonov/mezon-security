@@ -180,11 +180,22 @@ class SecurityRules
      * @param string $value
      *            Value to be made secure
      * @return string Secure value
-     * @codeCoverageIgnore
      */
     public function getStringValue(string $value): string
     {
         return htmlspecialchars($value);
+    }
+
+    /**
+     * Returning int value
+     *
+     * @param mixed $value
+     *            Value to be made secure
+     * @return int Secure value
+     */
+    public function getIntValue($value): int
+    {
+        return intval($value);
     }
 
     /**

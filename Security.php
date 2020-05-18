@@ -54,6 +54,19 @@ class Security
     }
 
     /**
+     * Returning int value
+     *
+     * @param mixed $value
+     *            Value to be made secure
+     * @return int Secure value
+     * @codeCoverageIgnore
+     */
+    public static function getIntValue($value): int
+    {
+        return self::getSecurityRules()->getIntValue($value);
+    }
+
+    /**
      * Method returns file value
      *
      * @param mixed $value
