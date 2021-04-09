@@ -10,7 +10,7 @@ namespace Mezon\Security;
  * @version v.1.0 (2019/10/08)
  * @copyright Copyright (c) 2019, aeon.org
  */
-// TODO fix paths
+
 /**
  * Security class
  *

@@ -1,8 +1,10 @@
 <?php
 namespace Mezon\Security\Validators\File;
 
+use Mezon\Security\Validators\AbstractValidator;
+
 /**
- * Class MimeType
+ * Class Size
  *
  * @package Mezon
  * @subpackage Security
@@ -10,8 +12,29 @@ namespace Mezon\Security\Validators\File;
  * @version v.1.0 (2020/05/13)
  * @copyright Copyright (c) 2020, aeon.org
  */
-class MimeType extends \Mezon\Security\Validators\AbstractValidator
+class Size extends AbstractValidator
 {
+
+    /**
+     * Bytes in KB
+     *
+     * @var integer
+     */
+    public const KB = 1024;
+
+    /**
+     * Bytes in MB
+     *
+     * @var integer
+     */
+    public const MB = 1048576;
+
+    /**
+     * Bytes in GB
+     *
+     * @var integer
+     */
+    public const GB = 1073741824;
 
     /**
      * Index in the $_FILES array
@@ -21,22 +44,22 @@ class MimeType extends \Mezon\Security\Validators\AbstractValidator
     private $file = '';
 
     /**
-     * Available mime types
+     * Required size in bytes
      *
-     * @var array
+     * @var integer
      */
-    private $requiredTypes = [];
+    private $requiredSize = 0;
 
     /**
      * Constructor
      *
-     * @param array $types
-     *            mime type constraint for the file
+     * @param int $size
+     *            size constraint for the file
      * @codeCoverageIgnore
      */
-    public function __construct(array $types)
+    public function __construct(int $size)
     {
-        $this->requiredTypes = $types;
+        $this->requiredSize = $size;
     }
 
     /**
@@ -48,7 +71,7 @@ class MimeType extends \Mezon\Security\Validators\AbstractValidator
     {
         $this->validateFilesFieldExists($this->file);
 
-        return in_array(mime_content_type($_FILES[$this->file]['tmp_name']), $this->requiredTypes);
+        return $_FILES[$this->file]['size'] <= $this->requiredSize;
     }
 
     /**

@@ -1,7 +1,14 @@
 <?php
 namespace Mezon\Security\Tests;
 
-class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+use Mezon\Security\SecurityRules;
+use Mezon\Security\Validators\File\Size;
+use Mezon\Security\Validators\File\MimeType;
+use Mezon\Security\Validators\File\ImageMaximumWidthHeight;
+use Mezon\Security\Validators\File\ImageMinimumWidthHeight;
+
+class SecurityRulesUnitTest extends TestCase
 {
 
     /**
@@ -58,7 +65,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
                 'size' => 0
             ]
         ];
-        $securityRules = $this->getMockBuilder(\Mezon\Security\SecurityRules::class)
+        $securityRules = $this->getMockBuilder(SecurityRules::class)
             ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
             ->setConstructorArgs([])
             ->getMock();
@@ -165,7 +172,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     {
         // setup
         $_FILES = $files;
-        $securityRules = $this->getMockBuilder(\Mezon\Security\SecurityRules::class)
+        $securityRules = $this->getMockBuilder(SecurityRules::class)
             ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
             ->setConstructorArgs([])
             ->getMock();
@@ -223,7 +230,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     public function testStoreFileContent(bool $decoded): void
     {
         // setup
-        $securityRules = $this->getMockBuilder(\Mezon\Security\SecurityRules::class)
+        $securityRules = $this->getMockBuilder(SecurityRules::class)
             ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
             ->setConstructorArgs([])
             ->getMock();
@@ -247,7 +254,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
      */
     protected function getStoreFileMock($returnValue): object
     {
-        $securityRules = $this->getMockBuilder(\Mezon\Security\SecurityRules::class)
+        $securityRules = $this->getMockBuilder(SecurityRules::class)
             ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
             ->setConstructorArgs([])
             ->getMock();
@@ -305,21 +312,21 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             [
                 $this->constructUploadedFile(2000, '1', '1'),
                 [
-                    new \Mezon\Security\Validators\File\Size(2000)
+                    new Size(2000)
                 ],
                 true
             ],
             [
                 $this->constructUploadedFile(2000, '1', '1'),
                 [
-                    new \Mezon\Security\Validators\File\Size(1500)
+                    new Size(1500)
                 ],
                 false
             ],
             [
                 $this->constructUploadedFile(2000, '1', '1', __DIR__ . '/SecurityRulesUnitTest.php'),
                 [
-                    new \Mezon\Security\Validators\File\MimeType([
+                    new MimeType([
                         'text/x-php'
                     ])
                 ],
@@ -328,7 +335,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             [
                 $this->constructUploadedFile(2000, '1', '1', __DIR__ . '/SecurityRulesUnitTest.php'),
                 [
-                    new \Mezon\Security\Validators\File\MimeType([
+                    new MimeType([
                         'image/png'
                     ])
                 ],
@@ -337,7 +344,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             [
                 $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
                 [
-                    new \Mezon\Security\Validators\File\MimeType([
+                    new MimeType([
                         'image/png'
                     ])
                 ],
@@ -346,56 +353,56 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
             [
                 $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
                 [
-                    new \Mezon\Security\Validators\File\ImageMaximumWidthHeight(500, 500)
+                    new ImageMaximumWidthHeight(500, 500)
                 ],
                 false
             ],
             [
                 $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
                 [
-                    new \Mezon\Security\Validators\File\ImageMaximumWidthHeight(500, 600)
+                    new ImageMaximumWidthHeight(500, 600)
                 ],
                 false
             ],
             [
                 $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
                 [
-                    new \Mezon\Security\Validators\File\ImageMaximumWidthHeight(500, 500)
+                    new ImageMaximumWidthHeight(500, 500)
                 ],
                 false
             ],
             [
                 $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
                 [
-                    new \Mezon\Security\Validators\File\ImageMaximumWidthHeight(600, 600)
+                    new ImageMaximumWidthHeight(600, 600)
                 ],
                 true
             ],
             [
                 $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
                 [
-                    new \Mezon\Security\Validators\File\ImageMinimumWidthHeight(500, 500)
+                    new ImageMinimumWidthHeight(500, 500)
                 ],
                 true
             ],
             [
                 $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
                 [
-                    new \Mezon\Security\Validators\File\ImageMinimumWidthHeight(600, 500)
+                    new ImageMinimumWidthHeight(600, 500)
                 ],
                 false
             ],
             [
                 $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
                 [
-                    new \Mezon\Security\Validators\File\ImageMinimumWidthHeight(500, 600)
+                    new ImageMinimumWidthHeight(500, 600)
                 ],
                 false
             ],
             [
                 $this->constructUploadedFile(6912, '1', '1', SecurityRulesUnitTest::TEST_PNG_IMAGE_PATH),
                 [
-                    new \Mezon\Security\Validators\File\ImageMinimumWidthHeight(600, 600)
+                    new ImageMinimumWidthHeight(600, 600)
                 ],
                 false
             ]
@@ -416,7 +423,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     public function testIsUploadedFileValid(array $file, array $validators, bool $requiredResult): void
     {
         // setup
-        $security = new \Mezon\Security\SecurityRules();
+        $security = new SecurityRules();
         $_FILES['is-valid-file'] = $file;
 
         // test body
@@ -435,10 +442,10 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                new \Mezon\Security\Validators\File\Size(2000)
+                new Size(2000)
             ],
             [
-                new \Mezon\Security\Validators\File\MimeType([
+                new MimeType([
                     'image/jpeg'
                 ])
             ]
@@ -458,7 +465,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Exception::class);
 
         // setup
-        $security = new \Mezon\Security\SecurityRules();
+        $security = new SecurityRules();
 
         // test body
         $security->isUploadedFileValid('unexisting-file', [
@@ -472,7 +479,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     public function testGetIntValue(): void
     {
         // setup
-        $security = new \Mezon\Security\SecurityRules();
+        $security = new SecurityRules();
 
         // test body and assertions
         $this->assertEquals(1, $security->getIntValue('1'));
@@ -487,7 +494,7 @@ class SecurityRulesUnitTest extends \PHPUnit\Framework\TestCase
     public function testGetStringValue(): void
     {
         // setup
-        $security = new \Mezon\Security\SecurityRules();
+        $security = new SecurityRules();
 
         // test body and assertions
         $this->assertEquals('1', $security->getStringValue('1'));

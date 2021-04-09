@@ -1,6 +1,8 @@
 <?php
 namespace Mezon\Security\Validators\File;
 
+use Mezon\Security\Validators\AbstractValidator;
+
 /**
  * Class ImageMaximumWidthHeight
  *
@@ -10,7 +12,7 @@ namespace Mezon\Security\Validators\File;
  * @version v.1.0 (2020/05/13)
  * @copyright Copyright (c) 2020, aeon.org
  */
-class ImageMaximumWidthHeight extends \Mezon\Security\Validators\AbstractValidator
+class ImageMaximumWidthHeight extends AbstractValidator
 {
 
     /**

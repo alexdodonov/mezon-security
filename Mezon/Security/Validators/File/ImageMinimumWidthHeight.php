@@ -1,8 +1,10 @@
 <?php
 namespace Mezon\Security\Validators\File;
 
+use Mezon\Security\Validators\AbstractValidator;
+
 /**
- * Class Size
+ * Class ImageMinimumWidthHeight
  *
  * @package Mezon
  * @subpackage Security
@@ -10,29 +12,8 @@ namespace Mezon\Security\Validators\File;
  * @version v.1.0 (2020/05/13)
  * @copyright Copyright (c) 2020, aeon.org
  */
-class Size extends \Mezon\Security\Validators\AbstractValidator
+class ImageMinimumWidthHeight extends AbstractValidator
 {
-
-    /**
-     * Bytes in KB
-     *
-     * @var integer
-     */
-    public const KB = 1024;
-
-    /**
-     * Bytes in MB
-     *
-     * @var integer
-     */
-    public const MB = 1048576;
-
-    /**
-     * Bytes in GB
-     *
-     * @var integer
-     */
-    public const GB = 1073741824;
 
     /**
      * Index in the $_FILES array
@@ -42,22 +23,33 @@ class Size extends \Mezon\Security\Validators\AbstractValidator
     private $file = '';
 
     /**
-     * Required size in bytes
+     * Minumum width of the image
      *
      * @var integer
      */
-    private $requiredSize = 0;
+    private $minimumWidth = 0;
+
+    /**
+     * Minumum height of the image
+     *
+     * @var integer
+     */
+    private $minimumHeight = 0;
 
     /**
      * Constructor
      *
-     * @param int $size
-     *            size constraint for the file
+     * @param int $width
+     *            width constraint for the file
+     * @param int $height
+     *            height constraint for the file
      * @codeCoverageIgnore
      */
-    public function __construct(int $size)
+    public function __construct(int $width, int $height)
     {
-        $this->requiredSize = $size;
+        $this->minimumWidth = $width;
+
+        $this->minimumHeight = $height;
     }
 
     /**
@@ -69,7 +61,9 @@ class Size extends \Mezon\Security\Validators\AbstractValidator
     {
         $this->validateFilesFieldExists($this->file);
 
-        return $_FILES[$this->file]['size'] <= $this->requiredSize;
+        list($width, $height) = getimagesize($_FILES[$this->file]['tmp_name']);
+
+        return $width >= $this->minimumWidth && $height >= $this->minimumHeight;
     }
 
     /**
