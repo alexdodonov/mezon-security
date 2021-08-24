@@ -22,19 +22,19 @@ class Security
     /**
      * Security rules
      *
-     * @var \Mezon\Security\SecurityRules
+     * @var ?SecurityRules
      */
     public static $securityRules = null;
 
     /**
      * Method returns security rules
      *
-     * @return \Mezon\Security\SecurityRules
+     * @return SecurityRules
      */
-    public static function getSecurityRules(): \Mezon\Security\SecurityRules
+    public static function getSecurityRules(): SecurityRules
     {
         if (self::$securityRules === null) {
-            self::$securityRules = new \Mezon\Security\SecurityRules();
+            self::$securityRules = new SecurityRules();
         }
 
         return self::$securityRules;

@@ -8,6 +8,10 @@ use Mezon\Security\Validators\File\MimeType;
 use Mezon\Security\Validators\File\ImageMaximumWidthHeight;
 use Mezon\Security\Validators\File\ImageMinimumWidthHeight;
 
+/**
+ *
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class SecurityRulesUnitTest extends TestCase
 {
 
@@ -38,7 +42,7 @@ class SecurityRulesUnitTest extends TestCase
      * @var array
      */
     public const FILE_SYSTEM_ACCESS_METHODS = [
-        '_prepareFs',
+        'prepareFs',
         'filePutContents',
         'moveUploadedFile',
         'fileGetContents'
@@ -65,8 +69,9 @@ class SecurityRulesUnitTest extends TestCase
                 'size' => 0
             ]
         ];
+        // TODO user SecurityRulesMock
         $securityRules = $this->getMockBuilder(SecurityRules::class)
-            ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
+            ->onlyMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
             ->setConstructorArgs([])
             ->getMock();
 
@@ -104,196 +109,6 @@ class SecurityRulesUnitTest extends TestCase
         }
 
         return $return;
-    }
-
-    /**
-     * Method constructs $_FILES array with one element
-     *
-     * @param int $size
-     *            size of the file
-     * @param string $file
-     *            file path
-     * @param string $name
-     *            file name
-     * @return array element of the $_FILES array
-     */
-    protected function constructTestFiles(int $size, string $file, string $name, string $tmpName = ''): array
-    {
-        return [
-            SecurityRulesUnitTest::TEST_FILE_FIELD_NAME => $this->constructUploadedFile($size, $file, $name, $tmpName)
-        ];
-    }
-
-    /**
-     * Data provider for the testGetFileValue test
-     *
-     * @return array data for test testGetFileValue
-     */
-    public function getFileValueProvider(): array
-    {
-        return [
-            [
-                true,
-                $this->constructTestFiles(2000, '1', '1')
-            ],
-            [
-                false,
-                $this->constructTestFiles(1, '1', '1')
-            ],
-            [
-                true,
-                $this->constructTestFiles(1, '', '1', '1')
-            ]
-        ];
-    }
-
-    /**
-     * Method returns true if the field tmp_name is set
-     *
-     * @param array $file
-     *            validating file description
-     * @return bool true if the field tmp_name is set, false otherwise
-     */
-    protected function tmpNameSet(array $file): bool
-    {
-        return isset($file['tmp_name']);
-    }
-
-    /**
-     * Testing edge cases of getFileValue
-     *
-     * @param bool $storeFile
-     *            do we need to store file
-     * @param array $files
-     *            file ddescription
-     * @dataProvider getFileValueProvider
-     */
-    public function testGetFileValue(bool $storeFile, array $files): void
-    {
-        // setup
-        $_FILES = $files;
-        $securityRules = $this->getMockBuilder(SecurityRules::class)
-            ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
-            ->setConstructorArgs([])
-            ->getMock();
-
-        if ($storeFile) {
-            if ($this->tmpNameSet($files[SecurityRulesUnitTest::TEST_FILE_FIELD_NAME])) {
-                $securityRules->expects($this->once())
-                    ->method('moveUploadedFile');
-            } else {
-                $securityRules->expects($this->once())
-                    ->method('filePutContents');
-            }
-        }
-
-        // test body
-        $result = $securityRules->getFileValue(SecurityRulesUnitTest::TEST_FILE_FIELD_NAME, $storeFile);
-
-        // assertions
-        if ($storeFile) {
-            $this->assertStringContainsString($this->getPathToStorage(), $result);
-        } else {
-            $this->assertEquals(1, $result['size']);
-
-            $this->assertEquals('1', $result['name']);
-            if ($this->tmpNameSet($files[SecurityRulesUnitTest::TEST_FILE_FIELD_NAME])) {
-                $this->assertEquals('1', $result['tmp_name']);
-            } else {
-                $this->assertEquals('1', $result['file']);
-            }
-        }
-    }
-
-    /**
-     * Data provider for the testStoreFileContent
-     *
-     * @return array data for the testStoreFileContent test
-     */
-    public function storeFileContentProvider(): array
-    {
-        return [
-            [
-                true
-            ],
-            [
-                false
-            ]
-        ];
-    }
-
-    /**
-     * Testing storeFileContent method
-     *
-     * @dataProvider storeFileContentProvider
-     */
-    public function testStoreFileContent(bool $decoded): void
-    {
-        // setup
-        $securityRules = $this->getMockBuilder(SecurityRules::class)
-            ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
-            ->setConstructorArgs([])
-            ->getMock();
-        $securityRules->method('_prepareFs')->willReturn('prepared');
-        $securityRules->expects($this->once())
-            ->method('filePutContents');
-
-        // test body
-        $result = $securityRules->storeFileContent('content', 'file-prefix', $decoded);
-
-        // assertions
-        $this->assertStringContainsString($this->getPathToStorage(), $result);
-    }
-
-    /**
-     * Mock creation function
-     *
-     * @param mixed $returnValue
-     *            return value of the fileGetContents method
-     * @return object mock
-     */
-    protected function getStoreFileMock($returnValue): object
-    {
-        $securityRules = $this->getMockBuilder(SecurityRules::class)
-            ->setMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
-            ->setConstructorArgs([])
-            ->getMock();
-        $securityRules->expects($this->once())
-            ->method('fileGetContents')
-            ->willReturn($returnValue);
-        $securityRules->method('_prepareFs')->willReturn('prepared');
-
-        return $securityRules;
-    }
-
-    /**
-     * Testing 'storeFile' method
-     */
-    public function testStoreFile(): void
-    {
-        // setup
-        $securityRules = $this->getStoreFileMock('content');
-
-        // test body
-        $result = $securityRules->storeFile('c://file', 'prefix');
-
-        // assertions
-        $this->assertStringContainsString($this->getPathToStorage(), $result);
-    }
-
-    /**
-     * Testing 'storeFile' method for unexisting file
-     */
-    public function testStoreUnexistingFile(): void
-    {
-        // setup
-        $securityRules = $this->getStoreFileMock(false);
-
-        // test body
-        $result = $securityRules->storeFile('c://file', 'prefix');
-
-        // assertions
-        $this->assertNull($result);
     }
 
     /**

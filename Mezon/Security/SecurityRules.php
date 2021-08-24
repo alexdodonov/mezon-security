@@ -75,7 +75,7 @@ class SecurityRules
     {
         $dir = $this->prepareFs($pathPrefix);
 
-        $fileName = md5(microtime(true));
+        $fileName = md5((string) microtime(true));
 
         if ($decoded) {
             $this->filePutContents($pathPrefix . $dir . $fileName, $fileContent);
@@ -91,12 +91,26 @@ class SecurityRules
      *
      * @param string $file
      *            path to the loading file
-     * @return string|bool file's content of false in case of error
+     * @return string file's content of false in case of error
      * @codeCoverageIgnore
      */
     protected function fileGetContents(string $file)
     {
-        return @file_get_contents($file);
+        $result = @file_get_contents($file);
+
+        return $result === false ? '' : $result;
+    }
+
+    /**
+     * Checking that file exists
+     *
+     * @param string $filePath
+     *            path to the file
+     * @return bool true if the file exists, false otherwise
+     */
+    private function fileExists(string $filePath): bool
+    {
+        return file_exists($filePath);
     }
 
     /**
@@ -110,12 +124,12 @@ class SecurityRules
      *            If the file was not encodded in base64
      * @return string Path to file or null if the image was not loaded
      */
-    public function storeFile(string $filePath, string $pathPrefix, bool $decoded = false): ?string
+    public function storeFile(string $filePath, string $pathPrefix, bool $decoded = false): string
     {
-        $fileContent = $this->fileGetContents($filePath);
-
-        if ($fileContent === false) {
-            return null;
+        if ($this->fileExists($filePath)) {
+            $fileContent = $this->fileGetContents($filePath);
+        } else {
+            throw (new \Exception('The file ' . $filePath . ' was not found'));
         }
 
         return $this->storeFileContent($fileContent, $pathPrefix, $decoded);
@@ -177,11 +191,11 @@ class SecurityRules
     /**
      * Returning string value
      *
-     * @param string $value
+     * @param mixed $value
      *            Value to be made secure
      * @return string Secure value
      */
-    public function getStringValue(string $value): string
+    public function getStringValue($value): string
     {
         return htmlspecialchars($value);
     }
