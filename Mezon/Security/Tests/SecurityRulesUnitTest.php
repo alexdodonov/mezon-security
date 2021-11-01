@@ -7,6 +7,7 @@ use Mezon\Security\Validators\File\Size;
 use Mezon\Security\Validators\File\MimeType;
 use Mezon\Security\Validators\File\ImageMaximumWidthHeight;
 use Mezon\Security\Validators\File\ImageMinimumWidthHeight;
+use Mezon\Conf\Conf;
 
 /**
  *
@@ -14,6 +15,16 @@ use Mezon\Security\Validators\File\ImageMinimumWidthHeight;
  */
 class SecurityRulesUnitTest extends TestCase
 {
+
+    /**
+     *
+     * {@inheritdoc}
+     * @see TestCase::setUp()
+     */
+    protected function setUp(): void
+    {
+        Conf::setConfigValue('fs/layer', 'mock');
+    }
 
     /**
      * Path to the directory where all files are stored
@@ -43,7 +54,6 @@ class SecurityRulesUnitTest extends TestCase
      */
     public const FILE_SYSTEM_ACCESS_METHODS = [
         'prepareFs',
-        'filePutContents',
         'moveUploadedFile',
         'fileGetContents'
     ];
@@ -69,7 +79,7 @@ class SecurityRulesUnitTest extends TestCase
                 'size' => 0
             ]
         ];
-        // TODO user SecurityRulesMock
+        // TODO remove it and use SecurityRules
         $securityRules = $this->getMockBuilder(SecurityRules::class)
             ->onlyMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
             ->setConstructorArgs([])

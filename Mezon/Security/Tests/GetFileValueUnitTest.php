@@ -2,6 +2,8 @@
 namespace Mezon\Security\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Mezon\Conf\Conf;
+use Mezon\Security\SecurityRules;
 
 /**
  *
@@ -9,6 +11,16 @@ use PHPUnit\Framework\TestCase;
  */
 class GetFileValueUnitTest extends TestCase
 {
+
+    /**
+     *
+     * {@inheritdoc}
+     * @see TestCase::setUp()
+     */
+    protected function setUp(): void
+    {
+        Conf::setConfigValue('fs/layer', 'mock');
+    }
 
     // TOD move to the base class
     /**
@@ -135,7 +147,7 @@ class GetFileValueUnitTest extends TestCase
     {
         // setup
         $_FILES = $files;
-        $securityRules = new SecurityRulesMock();
+        $securityRules = new SecurityRules();
 
         // test body
         $result = $securityRules->getFileValue(GetFileValueUnitTest::TEST_FILE_FIELD_NAME, $storeFile);

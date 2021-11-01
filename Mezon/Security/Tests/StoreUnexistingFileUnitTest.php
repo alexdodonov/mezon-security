@@ -2,6 +2,8 @@
 namespace Mezon\Security\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Mezon\Conf\Conf;
+use Mezon\Security\SecurityRules;
 
 /**
  *
@@ -11,12 +13,22 @@ class StoreUnexistingFileUnitTest extends TestCase
 {
 
     /**
+     *
+     * {@inheritdoc}
+     * @see TestCase::setUp()
+     */
+    protected function setUp(): void
+    {
+        Conf::setConfigValue('fs/layer', 'mock');
+    }
+
+    /**
      * Testing 'storeFile' method for unexisting file
      */
     public function testStoreUnexistingFile(): void
     {
         // setup
-        $securityRules = new SecurityRulesMock();
+        $securityRules = new SecurityRules();
 
         // assertions
         $this->expectException(\Exception::class);

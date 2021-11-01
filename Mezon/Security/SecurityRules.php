@@ -1,6 +1,8 @@
 <?php
 namespace Mezon\Security;
 
+use Mezon\Fs\Layer;
+
 /**
  * Class SecurityRules
  *
@@ -29,35 +31,21 @@ class SecurityRules
      */
     protected function prepareFs(string $pathPrefix): string
     {
-        @mkdir($pathPrefix . '/data/');
+        Layer::createDirectory($pathPrefix . '/data/');
 
         $path = '/data/files/';
 
-        @mkdir($pathPrefix . $path);
+        Layer::createDirectory($pathPrefix . $path);
 
-        @mkdir($pathPrefix . $path . date('Y') . '/');
+        Layer::createDirectory($pathPrefix . $path . date('Y') . '/');
 
-        @mkdir($pathPrefix . $path . date('Y') . '/' . date('m') . '/');
+        Layer::createDirectory($pathPrefix . $path . date('Y') . '/' . date('m') . '/');
 
         $dir = $path . date('Y') . '/' . date('m') . '/' . date('d') . '/';
 
-        @mkdir($pathPrefix . $dir);
+        Layer::createDirectory($pathPrefix . $dir);
 
         return $dir;
-    }
-
-    /**
-     * Method stores file on disk
-     *
-     * @param string $file
-     *            file path
-     * @param string $content
-     *            file content
-     * @codeCoverageIgnore
-     */
-    protected function filePutContents(string $file, string $content): void
-    {
-        file_put_contents($file, $content);
     }
 
     /**
@@ -78,9 +66,9 @@ class SecurityRules
         $fileName = md5((string) microtime(true));
 
         if ($decoded) {
-            $this->filePutContents($pathPrefix . $dir . $fileName, $fileContent);
+            Layer::filePutContents($pathPrefix . $dir . $fileName, $fileContent);
         } else {
-            $this->filePutContents($pathPrefix . $dir . $fileName, base64_decode($fileContent));
+            Layer::filePutContents($pathPrefix . $dir . $fileName, base64_decode($fileContent));
         }
 
         return $dir . $fileName;
@@ -177,7 +165,7 @@ class SecurityRules
                 pathinfo($value['name'], PATHINFO_EXTENSION);
 
             if (isset($value['file'])) {
-                $this->filePutContents($uploadFile, base64_decode($value['file']));
+                Layer::filePutContents($uploadFile, base64_decode($value['file']));
             } else {
                 $this->moveUploadedFile($value['tmp_name'], $uploadFile);
             }
