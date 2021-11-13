@@ -31,7 +31,7 @@ class SecurityRulesUnitTest extends TestCase
      *
      * @var string
      */
-    public const PATH_TO_FILE_STORAGE = '/data/files/';
+    public const PATH_TO_FILE_STORAGE = '/Data/Files/';
 
     /**
      * Field name of the testing file

@@ -31,9 +31,9 @@ class SecurityRules
      */
     protected function prepareFs(string $pathPrefix): string
     {
-        Layer::createDirectory($pathPrefix . '/data/');
+        Layer::createDirectory($pathPrefix . '/Data/');
 
-        $path = '/data/files/';
+        $path = '/Data/Files/';
 
         Layer::createDirectory($pathPrefix . $path);
 

@@ -29,7 +29,7 @@ class StoreFileContentUnitTest extends TestCase
      * @var string
      *
      */
-    public const PATH_TO_FILE_STORAGE = '/data/files/';
+    public const PATH_TO_FILE_STORAGE = '/Data/Files/';
 
     // TODO move it to the base class
     /**

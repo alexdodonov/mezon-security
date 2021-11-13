@@ -1,18 +1,18 @@
 <?php
 namespace Mezon\Security\Validators\File;
 
-use Mezon\Security\Validators\AbstractValidator;
+use Mezon\Security\Validators\ValidatorInterface;
 
 /**
  * Class Size
  *
- * @package Mezon
- * @subpackage Security
+ * @package Security
+ * @subpackage FileValidators
  * @author Dodonov A.A.
  * @version v.1.0 (2020/05/13)
  * @copyright Copyright (c) 2020, aeon.org
  */
-class Size extends AbstractValidator
+class Size extends UploadingFile
 {
 
     /**
@@ -37,13 +37,6 @@ class Size extends AbstractValidator
     public const GB = 1073741824;
 
     /**
-     * Index in the $_FILES array
-     *
-     * @var string
-     */
-    private $file = '';
-
-    /**
      * Required size in bytes
      *
      * @var integer
@@ -65,22 +58,18 @@ class Size extends AbstractValidator
     /**
      *
      * {@inheritdoc}
-     * @see \Mezon\Security\Validators\ValidatorInterface::valid()
+     * @see ValidatorInterface::valid()
      */
     public function valid(): bool
     {
-        $this->validateFilesFieldExists($this->file);
+        $this->validateFilesFieldExists($this->getKey());
 
-        return $_FILES[$this->file]['size'] <= $this->requiredSize;
-    }
+        /**
+         *
+         * @var array<string, string> $uploadingFile
+         */
+        $uploadingFile = $_FILES[$this->getKey()];
 
-    /**
-     *
-     * {@inheritdoc}
-     * @see \Mezon\Security\Validators\ValidatorInterface::setValidatingData()
-     */
-    public function setValidatingData($data): void
-    {
-        $this->file = $data;
+        return $uploadingFile['size'] <= $this->requiredSize;
     }
 }
