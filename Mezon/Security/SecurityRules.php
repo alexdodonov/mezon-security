@@ -71,7 +71,7 @@ class SecurityRules
             Layer::filePutContents($pathPrefix . $dir . $fileName, base64_decode($fileContent));
         }
 
-        return $dir . $fileName;
+        return $pathPrefix . $dir . $fileName;
     }
 
     /**
