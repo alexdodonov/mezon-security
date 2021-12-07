@@ -138,7 +138,7 @@ class GetFileValueUnitTest extends TestCase
      *
      * @param bool $storeFile
      *            do we need to store file
-     * @param array $files
+     * @param array<string, array<array-key, mixed>> $files
      *            file ddescription
      * @dataProvider getFileValueProvider
      * @psalm-suppress PossiblyInvalidArgument, PossiblyInvalidArrayOffset

@@ -37,7 +37,7 @@
 		"test": "php ./vendor/phpunit/phpunit/phpunit --order-by=random",
 		"psalm": "php ./vendor/vimeo/psalm/psalm --show-info=true --no-cache",
 		"debug": "php ./vendor/phpunit/phpunit/phpunit --filter testGetFileValue",
-		"infection" : "php ./vendor/infection/infection/bin/infection",
+		"infection" : "php ./vendor/infection/infection/bin/infection --min-msi=39",
 		"psalm-self": "php ./vendor/vimeo/psalm/psalm --config=psalm-self.xml --show-info=true --no-cache",
 		"test-unit": "php ./vendor/phpunit/phpunit/phpunit --testsuite unit --order-by=random"
 	}

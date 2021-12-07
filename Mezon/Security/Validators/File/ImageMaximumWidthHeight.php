@@ -54,6 +54,7 @@ class ImageMaximumWidthHeight extends UploadingFile
     {
         $this->validateFilesFieldExists($this->getKey());
 
+        /** @var array<string, array{tmp_name: string}> $_FILES */
         list ($width, $height) = getimagesize($_FILES[$this->getKey()]['tmp_name']);
 
         return $width <= $this->maximumWidth && $height <= $this->maximumHeight;

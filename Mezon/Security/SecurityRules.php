@@ -2,6 +2,7 @@
 namespace Mezon\Security;
 
 use Mezon\Fs\Layer;
+use Mezon\Security\Validators\ValidatorInterface;
 
 /**
  * Class SecurityRules
@@ -25,9 +26,8 @@ class SecurityRules
      * Method prepares file system for saving file
      *
      * @param string $pathPrefix
-     *            Prefix to file path
-     * @return string File path
-     * @codeCoverageIgnore
+     *            prefix to file path
+     * @return string file path
      */
     protected function prepareFs(string $pathPrefix): string
     {
@@ -52,11 +52,11 @@ class SecurityRules
      * Method stores file on disk
      *
      * @param string $fileContent
-     *            Content of the saving file
+     *            content of the saving file
      * @param string $pathPrefix
-     *            Prefix to file
+     *            prefix to file
      * @param bool $decoded
-     *            If the file was not encodded in base64
+     *            if the file was not encodded in base64
      * @return string Path to file
      */
     public function storeFileContent(string $fileContent, string $pathPrefix, bool $decoded = false): string
@@ -105,11 +105,11 @@ class SecurityRules
      * Method stores file on disk
      *
      * @param string $filePath
-     *            Path to the saving file
+     *            path to the saving file
      * @param string $pathPrefix
-     *            Prefix to file
+     *            prefix to file
      * @param bool $decoded
-     *            If the file was not encodded in base64
+     *            if the file was not encodded in base64
      * @return string Path to file or null if the image was not loaded
      */
     public function storeFile(string $filePath, string $pathPrefix, bool $decoded = false): string
@@ -140,20 +140,22 @@ class SecurityRules
     /**
      * Method returns file value
      *
-     * @param mixed $value
-     *            Data about the uploaded file
+     * @param string|array $value
+     *            data about the uploaded file
      * @param bool $storeFiles
      *            Must be the file stored in the file system of the service or not
      * @param string $pathPrefix
      *            prefix of the file path
-     * @return string|array Path to the stored file or the array $value itself
+     * @return string|array path to the stored file or the array $value itself
      */
     public function getFileValue($value, bool $storeFiles, string $pathPrefix = '.')
     {
         if (is_string($value)) {
+            /** @var array<string, array{size: int, name: string, tmp_name: string, file: string}> $_FILES */
             $value = $_FILES[$value];
         }
 
+        /** @var array{size: int, name: string, tmp_name: string, file: string} $value */
         if (isset($value['size']) && $value['size'] === 0) {
             return '';
         }
@@ -180,20 +182,20 @@ class SecurityRules
      * Returning string value
      *
      * @param mixed $value
-     *            Value to be made secure
-     * @return string Secure value
+     *            value to be made secure
+     * @return string secure value
      */
     public function getStringValue($value): string
     {
-        return htmlspecialchars($value);
+        return htmlspecialchars((string) $value);
     }
 
     /**
      * Returning int value
      *
      * @param mixed $value
-     *            Value to be made secure
-     * @return int Secure value
+     *            value to be made secure
+     * @return int secure value
      */
     public function getIntValue($value): int
     {
@@ -205,7 +207,7 @@ class SecurityRules
      *
      * @param string $fieldName
      *            field in the $_FILES array
-     * @param array $validators
+     * @param ValidatorInterface[] $validators
      *            list of validators
      * @return bool true if the file valid and false otherwise.
      */

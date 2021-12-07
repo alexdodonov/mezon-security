@@ -8,6 +8,7 @@ use Mezon\Security\Validators\File\MimeType;
 use Mezon\Security\Validators\File\ImageMaximumWidthHeight;
 use Mezon\Security\Validators\File\ImageMinimumWidthHeight;
 use Mezon\Conf\Conf;
+use Mezon\Security\Validators\ValidatorInterface;
 
 /**
  *
@@ -239,7 +240,7 @@ class SecurityRulesUnitTest extends TestCase
      *
      * @param array $file
      *            uploaded file
-     * @param array $validators
+     * @param ValidatorInterface[] $validators
      *            validators
      * @param bool $requiredResult
      *            required result
@@ -261,7 +262,7 @@ class SecurityRulesUnitTest extends TestCase
     /**
      * Data provider for the test testValidatingUnexistingFile
      *
-     * @return array testing data
+     * @return ValidatorInterface[][] testing data
      */
     public function validatingUnexistingFileProvider(): array
     {
@@ -280,11 +281,11 @@ class SecurityRulesUnitTest extends TestCase
     /**
      * Trying to validate size of the unexisting file
      *
-     * @param object $validator
+     * @param ValidatorInterface $validator
      *            validator
      * @dataProvider validatingUnexistingFileProvider
      */
-    public function testValidatingUnexistingFile(object $validator): void
+    public function testValidatingUnexistingFile(ValidatorInterface $validator): void
     {
         // assertions
         $this->expectException(\Exception::class);

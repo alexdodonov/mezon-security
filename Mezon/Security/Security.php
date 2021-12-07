@@ -4,7 +4,7 @@ namespace Mezon\Security;
 /**
  * Class Security
  *
- * @package Mezon
+ * @package Security
  * @subpackage Security
  * @author Dodonov A.A.
  * @version v.1.0 (2019/10/08)
@@ -44,8 +44,8 @@ class Security
      * Returning string value
      *
      * @param string $value
-     *            Value to be made secure
-     * @return string Secure value
+     *            value to be made secure
+     * @return string secure value
      * @codeCoverageIgnore
      */
     public static function getStringValue(string $value): string
@@ -57,8 +57,8 @@ class Security
      * Returning int value
      *
      * @param mixed $value
-     *            Value to be made secure
-     * @return int Secure value
+     *            value to be made secure
+     * @return int secure value
      * @codeCoverageIgnore
      */
     public static function getIntValue($value): int
@@ -69,11 +69,11 @@ class Security
     /**
      * Method returns file value
      *
-     * @param mixed $value
-     *            Data about the uploaded file
+     * @param string|array $value
+     *            data about the uploaded file
      * @param bool $storeFiles
-     *            Must be the file stored in the file system of the service or not
-     * @return string|array Path to the stored file or the array $value itself
+     *            must be the file stored in the file system of the service or not
+     * @return string|array path to the stored file or the array $value itself
      * @codeCoverageIgnore
      */
     public static function getFileValue($value, bool $storeFiles)
@@ -85,11 +85,11 @@ class Security
      * Method stores file on disk
      *
      * @param string $fileContent
-     *            Content of the saving file
+     *            content of the saving file
      * @param string $pathPrefix
-     *            Prefix to file
+     *            prefix to file
      * @param bool $decoded
-     *            If the file was not encodded in base64
+     *            if the file was not encodded in base64
      * @return string Path to file
      * @codeCoverageIgnore
      */
@@ -102,11 +102,11 @@ class Security
      * Method stores file on disk
      *
      * @param string $filePath
-     *            Path to the saving file
+     *            path to the saving file
      * @param string $pathPrefix
-     *            Prefix to file
+     *            prefix to file
      * @param bool $decoded
-     *            If the file was not encodded in base64
+     *            if the file was not encodded in base64
      * @return string Path to file or null if the image was not loaded
      * @codeCoverageIgnore
      */
