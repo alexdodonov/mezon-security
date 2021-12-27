@@ -49,51 +49,6 @@ class SecurityRulesUnitTest extends TestCase
     public const TEST_PNG_IMAGE_PATH = __DIR__ . '/res/test.png';
 
     /**
-     * List of methods wich provides file system access and need to be mocked
-     *
-     * @var array
-     */
-    public const FILE_SYSTEM_ACCESS_METHODS = [
-        'prepareFs',
-        'moveUploadedFile',
-        'fileGetContents'
-    ];
-
-    /**
-     * Method returns path to storage
-     *
-     * @return string path to storage
-     */
-    protected function getPathToStorage(): string
-    {
-        return SecurityRulesUnitTest::PATH_TO_FILE_STORAGE . date('Y/m/d/');
-    }
-
-    /**
-     * Testing edge cases of getFileValue
-     */
-    public function testGetEmptyFileValue(): void
-    {
-        // setup
-        $_FILES = [
-            'empty-file' => [
-                'size' => 0
-            ]
-        ];
-        // TODO remove it and use SecurityRules
-        $securityRules = $this->getMockBuilder(SecurityRules::class)
-            ->onlyMethods(SecurityRulesUnitTest::FILE_SYSTEM_ACCESS_METHODS)
-            ->setConstructorArgs([])
-            ->getMock();
-
-        // test body
-        $result = $securityRules->getFileValue('empty-file', false);
-
-        // assertions
-        $this->assertEquals('', $result);
-    }
-
-    /**
      * Method constructs element of the $_FILES array
      *
      * @param int $size

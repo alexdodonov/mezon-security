@@ -29,7 +29,7 @@ class SecurityRules
      *            prefix to file path
      * @return string file path
      */
-    protected function prepareFs(string $pathPrefix): string
+    private function prepareFs(string $pathPrefix): string
     {
         Layer::createDirectory($pathPrefix . '/Data/');
 
@@ -75,33 +75,6 @@ class SecurityRules
     }
 
     /**
-     * Method returns file's content of false in case of error
-     *
-     * @param string $file
-     *            path to the loading file
-     * @return string file's content of false in case of error
-     * @codeCoverageIgnore
-     */
-    protected function fileGetContents(string $file)
-    {
-        $result = @file_get_contents($file);
-
-        return $result === false ? '' : $result;
-    }
-
-    /**
-     * Checking that file exists
-     *
-     * @param string $filePath
-     *            path to the file
-     * @return bool true if the file exists, false otherwise
-     */
-    private function fileExists(string $filePath): bool
-    {
-        return file_exists($filePath);
-    }
-
-    /**
      * Method stores file on disk
      *
      * @param string $filePath
@@ -114,8 +87,8 @@ class SecurityRules
      */
     public function storeFile(string $filePath, string $pathPrefix, bool $decoded = false): string
     {
-        if ($this->fileExists($filePath)) {
-            $fileContent = $this->fileGetContents($filePath);
+        if (Layer::fileExists($filePath)) {
+            $fileContent = Layer::existingFileGetContents($filePath);
         } else {
             throw (new \Exception('The file ' . $filePath . ' was not found'));
         }
@@ -132,7 +105,7 @@ class SecurityRules
      *            destination file path
      * @codeCoverageIgnore
      */
-    protected function moveUploadedFile(string $from, string $to): void
+    private function moveUploadedFile(string $from, string $to): void
     {
         move_uploaded_file($from, $to);
     }

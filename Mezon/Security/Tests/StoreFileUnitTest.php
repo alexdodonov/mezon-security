@@ -4,6 +4,8 @@ namespace Mezon\Security\Tests;
 use PHPUnit\Framework\TestCase;
 use Mezon\Conf\Conf;
 use Mezon\Security\SecurityRules;
+use Mezon\Fs\Layer;
+use Mezon\Fs\InMemory;
 
 /**
  *
@@ -48,6 +50,8 @@ class StoreFileUnitTest extends TestCase
     public function testStoreFile(): void
     {
         // setup
+        Layer::$existingFiles[] = __DIR__ . '/res/test.png';
+        InMemory::preloadFile(__DIR__ . '/res/test.png');
         $securityRules = new SecurityRules();
 
         // test body
@@ -55,5 +59,7 @@ class StoreFileUnitTest extends TestCase
 
         // assertions
         $this->assertStringContainsString($this->getPathToStorage(), $result);
+        $this->assertTrue(Layer::directoryExists('prefix/Data/'));
+        $this->assertTrue(Layer::directoryExists('prefix/Data/Files/'));
     }
 }
