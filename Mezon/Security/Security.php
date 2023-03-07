@@ -110,7 +110,7 @@ class Security
      * @return string Path to file or null if the image was not loaded
      * @codeCoverageIgnore
      */
-    public static function storeFile(string $filePath, string $pathPrefix, bool $decoded = false): ?string
+    public static function storeFile(string $filePath, string $pathPrefix, bool $decoded = false): string
     {
         return self::getSecurityRules()->storeFile($filePath, $pathPrefix, $decoded);
     }
