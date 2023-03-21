@@ -64,10 +64,7 @@ class Size extends UploadingFile
     {
         $this->validateFilesFieldExists($this->getKey());
 
-        /**
-         *
-         * @var array<string, string> $uploadingFile
-         */
+        /** @var array<string, array{size: int}> $_FILES */
         $uploadingFile = $_FILES[$this->getKey()];
 
         return $uploadingFile['size'] <= $this->requiredSize;

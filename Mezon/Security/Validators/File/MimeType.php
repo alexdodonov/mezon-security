@@ -43,10 +43,7 @@ class MimeType extends UploadingFile
     {
         $this->validateFilesFieldExists($this->getKey());
 
-        /**
-         *
-         * @var array<string, string> $uploadingFile
-         */
+        /** @var array<string, array{tmp_name: string}> $_FILES */
         $uploadingFile = $_FILES[$this->getKey()];
 
         return in_array(mime_content_type($uploadingFile['tmp_name']), $this->requiredTypes);
